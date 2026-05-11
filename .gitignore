@@ -1,0 +1,28 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.user
+
+# Environment
+.env
+.env.local
+.env*.local
+
+# Logs
+*.log
+logs/
+
+# Dependencies (добавишь нужное когда определишься с языком)
+node_modules/
+__pycache__/
+*.pyc
+
+# Build
+dist/
+build/
+out/
