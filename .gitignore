@@ -26,3 +26,6 @@ __pycache__/
 dist/
 build/
 out/
+
+#Tasks
+TaskDescription/
