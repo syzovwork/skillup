@@ -1,29 +1,37 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version change: (initial template) → 1.0.0
-Bump rationale: First ratified version — all placeholders replaced with concrete principles.
+Version change: 1.0.0 → 1.1.0
+Bump rationale (MINOR): Principle II materially expanded — adds a sanctioned
+"Vector store" component (Chroma) alongside the existing approved stack and
+defines the rule for future vector-store substitutions. No principles removed
+or redefined; no governance changes.
 
 Modified principles:
-  - [PRINCIPLE_1_NAME] → I. Code Quality & Clean Architecture
-  - [PRINCIPLE_2_NAME] → II. Tech Stack Governance
-  - [PRINCIPLE_3_NAME] → III. AI Traceability & Prompt Discipline (NON-NEGOTIABLE)
-  - [PRINCIPLE_4_NAME] → IV. Testing Discipline
-  - [PRINCIPLE_5_NAME] → V. Spec-Driven Development (NON-NEGOTIABLE)
+  - II. Tech Stack Governance — added Vector store clause + future-substitution rule
 
-Added sections:
-  - Performance & Security Standards (replaces [SECTION_2_NAME])
-  - Development Workflow & Quality Gates (replaces [SECTION_3_NAME])
-
+Added sections: none (clause added inside an existing principle)
 Removed sections: none
 
 Templates requiring updates:
-  - ✅ .specify/templates/plan-template.md — "Constitution Check" gate references this file generically; no edits required.
-  - ✅ .specify/templates/spec-template.md — no constitution-specific placeholders detected; no edits required.
-  - ✅ .specify/templates/tasks-template.md — task categories compatible (unit/integration tests, AI pipeline); no edits required.
+  - ✅ .specify/templates/plan-template.md — generic Constitution Check; no edits required.
+  - ✅ .specify/templates/spec-template.md — no constitution-specific tokens; no edits required.
+  - ✅ .specify/templates/tasks-template.md — categories already compatible; no edits required.
   - ✅ .specify/templates/checklist-template.md — generic; no edits required.
 
+Dependent feature artifacts:
+  - ✅ specs/001-social-chatbot/plan.md — Complexity Tracking entry for Chroma is now consistent with Principle II; the row remains valid as a record of the architectural decision but no longer represents a deviation.
+
 Follow-up TODOs: none
+
+Amendment log:
+  - 2026-05-14 (v1.0.0): initial ratification.
+  - 2026-05-14 (v1.1.0): Principle II expanded to permit an external vector
+    store (Chroma) as a complementary engine alongside MS SQL. Justification:
+    plan.md for feature 001-social-chatbot requires vector similarity search
+    over PDF brand briefs; MS SQL Server's vector type is not GA on the
+    LocalDB targets used by the PoC. Future substitutions of the vector store
+    require a new MINOR bump + Complexity Tracking entry.
 -->
 
 # SkillUp AI Chatbot PoC Constitution
@@ -55,12 +63,20 @@ amendment to this constitution:
 - **Frontend**: **React** (functional components + hooks).
 - **Structured data**: **Microsoft SQL Server**. Schema changes go through
   migrations; no ad-hoc DDL.
+- **Vector store**: an external vector store (currently **Chroma**) is
+  permitted as a dedicated embedding storage engine. It is **not** a
+  replacement for Microsoft SQL Server but a complementary component for
+  semantic similarity search over unstructured content (e.g., PDF brand
+  briefs). Any future change to a different vector store requires a new
+  MINOR bump of this constitution and a Complexity Tracking update in
+  `plan.md`.
 - **LLM access**: **Azure AI Foundry** and/or **EPAM DIAL API**. No direct calls
   to other providers (OpenAI, Anthropic, etc.) from application code.
 
-Introducing a new framework, database engine, or LLM provider requires a written
-justification in `plan.md` under "Complexity Tracking" and a constitution
-amendment (MINOR bump minimum).
+Introducing a new framework, database engine (other than the sanctioned
+vector store above), or LLM provider requires a written justification in
+`plan.md` under "Complexity Tracking" **and** a constitution amendment
+(MINOR bump minimum).
 
 **Rationale**: Stack lock-in for a PoC prevents accidental sprawl and keeps the
 evaluation comparable to the production target environment.
@@ -180,4 +196,4 @@ amended.
 checked" and call out any complexity-tracking justifications. Periodic reviews
 (at least once per milestone) reconcile drift between code and constitution.
 
-**Version**: 1.0.0 | **Ratified**: 2026-05-14 | **Last Amended**: 2026-05-14
+**Version**: 1.1.0 | **Ratified**: 2026-05-14 | **Last Amended**: 2026-05-14

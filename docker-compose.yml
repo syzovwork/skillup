@@ -1,0 +1,57 @@
+# SkillUp AI Chatbot PoC — local dependencies
+#
+# Bring up:
+#   docker compose up -d
+#
+# Required env vars (set in a local .env file or your shell — NEVER commit):
+#   SA_PASSWORD   — sa-user password for the SQL Server container.
+#                   Must satisfy Microsoft's complexity rules:
+#                   ≥ 8 chars, contains upper, lower, digit, and symbol.
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: skillup-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: Developer
+      SA_PASSWORD: "${SA_PASSWORD:?SA_PASSWORD must be set in your environment or .env file}"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$SA_PASSWORD\" -Q 'SELECT 1' -C -No"
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    restart: unless-stopped
+
+  chroma:
+    image: chromadb/chroma:latest
+    container_name: skillup-chroma
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma-data:/data
+    environment:
+      IS_PERSISTENT: "TRUE"
+      ANONYMIZED_TELEMETRY: "FALSE"
+    healthcheck:
+      test:
+        - "CMD"
+        - "/bin/sh"
+        - "-c"
+        - "wget -q -O- http://localhost:8000/api/v2/heartbeat || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    restart: unless-stopped
+
+volumes:
+  sqlserver-data:
+  chroma-data:

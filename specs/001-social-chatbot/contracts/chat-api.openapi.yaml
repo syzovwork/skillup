@@ -1,0 +1,149 @@
+openapi: 3.0.3
+info:
+  title: Social Media Insights Chatbot API
+  version: 0.1.0
+  description: >
+    Single chat endpoint for the multi-brand social media insights chatbot
+    PoC. The backend classifies each question and answers using a SQL tool
+    (over the Posts table), a RAG tool (over Chroma-indexed brand briefs),
+    or both. No authentication for the PoC.
+servers:
+  - url: http://localhost:5080
+    description: Local backend
+paths:
+  /api/chat:
+    post:
+      operationId: chat
+      summary: Ask the chatbot a question
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+            examples:
+              metricsQuestion:
+                value:
+                  message: "Which post had the highest engagement last month?"
+                  history: []
+              mixedQuestion:
+                value:
+                  message: "Based on Aurora's guidelines and last month's data, what should I post next?"
+                  history:
+                    - role: user
+                      content: "Let's focus on Aurora."
+                    - role: assistant
+                      content: "Sure — what would you like to know about Aurora?"
+      responses:
+        '200':
+          description: Successful answer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+              examples:
+                metricsAnswer:
+                  value:
+                    answer: "Aurora's Reel from 2026-04-22 had the highest engagement last month: 12,431 (likes 9,802, comments 421, shares 1,108, saves 1,100). It was published on Instagram."
+                    category: "metrics"
+                    sourcesUsed: ["metrics"]
+                    correlationId: "8c52b817-1234-..."
+        '400':
+          description: Malformed request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '422':
+          description: Validated answer could not be produced (e.g. validator rejected and fallback was used)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+        '500':
+          description: Internal server error (logged with correlationId)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/health:
+    get:
+      operationId: health
+      summary: Liveness probe
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string, example: "ok" }
+                  dependencies:
+                    type: object
+                    properties:
+                      sql: { type: string, enum: [ok, degraded, down] }
+                      chroma: { type: string, enum: [ok, degraded, down] }
+                      dial: { type: string, enum: [ok, degraded, down, unchecked] }
+components:
+  schemas:
+    ChatRequest:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+          minLength: 1
+          maxLength: 2000
+          description: The user's natural-language question.
+        history:
+          type: array
+          maxItems: 20
+          description: >
+            Prior conversation turns this session, oldest first. Client-resident;
+            the backend is stateless between requests.
+          items:
+            $ref: '#/components/schemas/ChatTurn'
+    ChatTurn:
+      type: object
+      required: [role, content]
+      properties:
+        role:
+          type: string
+          enum: [user, assistant]
+        content:
+          type: string
+          minLength: 1
+          maxLength: 4000
+    ChatResponse:
+      type: object
+      required: [answer, category, sourcesUsed, correlationId]
+      properties:
+        answer:
+          type: string
+          description: The validated, user-facing answer.
+        category:
+          type: string
+          enum: [metrics, brief, mixed, clarify]
+          description: Router classification used to produce the answer.
+        sourcesUsed:
+          type: array
+          items: { type: string }
+          description: >
+            Source attribution tokens for UI display. Examples:
+            "metrics", "brief:Aurora", "brief:Nimbus".
+        clarifyingQuestion:
+          type: string
+          nullable: true
+          description: When category is "clarify", the disambiguation question to show the user.
+        correlationId:
+          type: string
+          description: Echo of the per-request correlation id (also in server logs).
+    ErrorResponse:
+      type: object
+      required: [error, correlationId]
+      properties:
+        error:
+          type: string
+        correlationId:
+          type: string

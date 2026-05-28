@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pwsh -File .specify/extensions/git/scripts/powershell/auto-commit.ps1 after_constitution)",
+      "Bash(dotnet --version)",
+      "Bash(npm --version)",
+      "Bash(dotnet new *)"
+    ]
+  }
+}

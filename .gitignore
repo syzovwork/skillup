@@ -3,29 +3,51 @@
 Thumbs.db
 
 # IDE
+.vs/
 .vscode/
 .idea/
 *.suo
 *.user
+*.userprefs
 
-# Environment
-.env
-.env.local
-.env*.local
+# .NET / C#
+bin/
+obj/
+*.dll
+*.pdb
+TestResults/
+.vs/
+*.binlog
+project.assets.json
+
+# .NET local secrets (User Secrets live outside repo, but appsettings overrides could leak)
+appsettings.*.local.json
+appsettings.Development.json
+secrets.json
+
+# Node / frontend
+node_modules/
+dist/
+build/
+.vite/
+coverage/
+*.tsbuildinfo
 
 # Logs
 *.log
 logs/
 
-# Dependencies (добавишь нужное когда определишься с языком)
-node_modules/
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Docker
+.dockerignore
+
+# Python (legacy)
 __pycache__/
 *.pyc
 
-# Build
-dist/
-build/
-out/
-
-#Tasks
+# Tasks workspace
 TaskDescription/

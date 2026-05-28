@@ -1,0 +1,49 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Default indent
+[*.{md,yml,yaml,json,jsonc,ts,tsx,js,jsx,mjs,cjs,html,css,scss}]
+indent_style = space
+indent_size = 2
+
+# C# / .NET — 4-space indent
+[*.{cs,csx,vb,vbx}]
+indent_style = space
+indent_size = 4
+
+[*.{csproj,sln,props,targets}]
+indent_style = space
+indent_size = 2
+
+# Code-style rules for .NET (T007 extends these)
+[*.cs]
+dotnet_diagnostic.IDE0005.severity = warning
+dotnet_sort_system_directives_first = true
+csharp_new_line_before_open_brace = all
+csharp_indent_case_contents = true
+csharp_indent_switch_labels = true
+csharp_style_namespace_declarations = file_scoped:warning
+csharp_style_prefer_primary_constructors = true:suggestion
+dotnet_style_qualification_for_field = false:warning
+dotnet_style_qualification_for_property = false:warning
+dotnet_style_qualification_for_method = false:warning
+dotnet_style_qualification_for_event = false:warning
+
+# Markdown — preserve trailing whitespace (line breaks)
+[*.md]
+trim_trailing_whitespace = false
+
+# PowerShell
+[*.{ps1,psm1,psd1}]
+indent_style = space
+indent_size = 4
+
+# SQL
+[*.sql]
+indent_style = space
+indent_size = 4
